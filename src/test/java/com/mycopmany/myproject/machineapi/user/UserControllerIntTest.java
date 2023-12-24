@@ -7,16 +7,11 @@ import com.mycopmany.myproject.machineapi.auth.AuthenticationService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.DynamicPropertyRegistry;
-import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
-import org.testcontainers.containers.MySQLContainer;
-
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -29,25 +24,9 @@ class UserControllerIntTest extends AbstractIntegrationTest {
     private AuthenticationService authenticationService;
     @Autowired
     private UserRepository userRepository;
-
-    private static final MySQLContainer<?> mysql = new MySQLContainer<>("mysql:8.1.0")
-            .withReuse(true);
     private MockMvc mockMvc;
     @Autowired
     private ObjectMapper objectMapper;
-
-    @DynamicPropertySource
-    public static void overrideProps(DynamicPropertyRegistry registry) {
-        registry.add("spring.datasource.url", mysql::getJdbcUrl);
-        registry.add("spring.datasource.username", mysql::getUsername);
-        registry.add("spring.datasource.password", mysql::getPassword);
-
-    }
-
-    static {
-        mysql.setPortBindings(List.of("3306:3306"));
-        mysql.start();
-    }
 
     @BeforeEach
     void setUp() {

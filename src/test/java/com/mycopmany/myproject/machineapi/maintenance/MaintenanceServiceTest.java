@@ -8,6 +8,7 @@ import com.mycopmany.myproject.machineapi.user.AuthenticatedUser;
 import com.mycopmany.myproject.machineapi.user.Role;
 import com.mycopmany.myproject.machineapi.user.User;
 import com.mycopmany.myproject.machineapi.user.UserRepository;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -47,6 +48,11 @@ class MaintenanceServiceTest {
         user = new User("firstname", "lastname", "username", "password", Role.USER);
         machine = new Machine(123L, "model", "category", "location");
         maintenance = new Maintenance("title", "description", user, machine);
+    }
+
+    @AfterEach
+    void tearDown() {
+        SecurityContextHolder.clearContext();
     }
 
     @Test
@@ -102,7 +108,7 @@ class MaintenanceServiceTest {
         assertThrows(ResourceNotFoundException.class, () -> maintenanceService.getMaintenanceByMachine(123L));
 
         verify(machineRepository).existsBySerialNumber(123L);
-        verify(maintenanceRepository,times(0)).findByMachineSerialNumber(123L);
+        verify(maintenanceRepository, times(0)).findByMachineSerialNumber(123L);
     }
 
     @Test
@@ -124,11 +130,12 @@ class MaintenanceServiceTest {
 
         maintenanceService.createMaintenance(maintenanceToCreate);
 
-        verify(maintenanceRepository,times(1)).save(maintenance);
+        verify(maintenanceRepository, times(1)).save(maintenance);
 
     }
+
     @Test
-    void createMaintenanceWhenMachineNotFound(){
+    void createMaintenanceWhenMachineNotFound() {
         MaintenanceToCreate maintenanceToCreate = new MaintenanceToCreate(
                 "title",
                 "description",
@@ -145,9 +152,10 @@ class MaintenanceServiceTest {
 
         assertThrows(ResourceNotFoundException.class,
                 () -> maintenanceService.createMaintenance(maintenanceToCreate));
-        verify(maintenanceRepository,times(0)).save(maintenance);
+        verify(maintenanceRepository, times(0)).save(maintenance);
 
     }
+
     @Test
     void createMaintenanceWhenEmptyTitle() {
         MaintenanceToCreate maintenanceToCreate = new MaintenanceToCreate(
@@ -166,11 +174,10 @@ class MaintenanceServiceTest {
         when(machineRepository.findBySerialNumber(machine.getSerialNumber())).thenReturn(Optional.of(machine));
 
         assertThrows(UnprocessableEntityException.class,
-                () ->maintenanceService.createMaintenance(maintenanceToCreate));
+                () -> maintenanceService.createMaintenance(maintenanceToCreate));
         verify(maintenanceRepository, times(0)).save(maintenance);
 
     }
-
 
 
     @Test
@@ -188,6 +195,7 @@ class MaintenanceServiceTest {
         assertEquals("newTitle", maintenance.getTitle());
         assertEquals("newDescription", maintenance.getDescription());
     }
+
     @Test
     void editMaintenanceWhenDoesNotExist() {
         MaintenanceToEdit maintenanceToEdit = new MaintenanceToEdit(
@@ -196,12 +204,13 @@ class MaintenanceServiceTest {
         );
         Long idToEdit = 3L;
 
-        assertThrows(ResourceNotFoundException.class,() -> maintenanceService
+        assertThrows(ResourceNotFoundException.class, () -> maintenanceService
                 .editMaintenance(3L, maintenanceToEdit));
 
         assertEquals("title", maintenance.getTitle());
         assertEquals("description", maintenance.getDescription());
     }
+
     @Test
     void deleteMaintenanceWhenIdExists() {
         when(maintenanceRepository.existsById(123L)).thenReturn(true);
@@ -216,7 +225,7 @@ class MaintenanceServiceTest {
     void deleteMaintenanceWhenIdDoesNotExist() {
         when(maintenanceRepository.existsById(123L)).thenReturn(false);
 
-        assertThrows(ResourceNotFoundException.class,() -> maintenanceService.deleteMaintenance(123L));
+        assertThrows(ResourceNotFoundException.class, () -> maintenanceService.deleteMaintenance(123L));
 
         verify(maintenanceRepository, times(0)).deleteById(123L);
 
