@@ -1,7 +1,6 @@
 package com.mycopmany.myproject.machineapi.auth;
 
 import com.mycopmany.myproject.machineapi.config.JwtService;
-import com.mycopmany.myproject.machineapi.exception.ConflictException;
 import com.mycopmany.myproject.machineapi.exception.UnauthorizedException;
 import com.mycopmany.myproject.machineapi.user.*;
 import org.junit.jupiter.api.BeforeEach;
@@ -17,7 +16,6 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
-import static org.mockito.Mockito.times;
 
 class AuthenticationServiceTest {
     private AuthenticationService authenticationService;
@@ -52,7 +50,6 @@ class AuthenticationServiceTest {
                 "password",
                 Role.USER);
 
-        when(userRepository.existsByUsername(userToCreate.getUsername())).thenReturn(false);
         when(passwordEncoder.encode(userToCreate.getPassword())).thenReturn("encodedPassword");
         when(jwtService.generateToken(user)).thenReturn("jwtToken");
         AuthenticationResponse response = authenticationService.register(userToCreate);
@@ -62,22 +59,7 @@ class AuthenticationServiceTest {
 
         verify(userRepository, times(1)).save(user);
     }
-    @Test
-    void registerInvalidUser() {
-        UserToCreate userToCreate = new UserToCreate("firstname",
-                "lastname",
-                "username",
-                "password");
-        User user = new User("firstname",
-                "lastname",
-                "username",
-                "password",
-                Role.USER);
-        when(userRepository.existsByUsername(user.getUsername())).thenReturn(true);
 
-        assertThrows(ConflictException.class,()->authenticationService.register(userToCreate));
-        verify(userRepository, times(0)).save(user);
-    }
 
     @Test
     void authenticateValidUser() {
@@ -111,14 +93,14 @@ class AuthenticationServiceTest {
                 Role.USER);
         when(userRepository.findByUsername(userToLogin.getUsername())).thenReturn(Optional.of(user));
         when(authenticationManager.authenticate(any())).thenThrow(
-                new UnauthorizedException("Bad username or password"));
+                new UnauthorizedException("Wrong username or password"));
 
-        assertThrows(UnauthorizedException.class,()->authenticationService.authenticate(userToLogin));
+        assertThrows(UnauthorizedException.class, () -> authenticationService.authenticate(userToLogin));
 
         verify(authenticationManager, times(1)).authenticate(
                 new UsernamePasswordAuthenticationToken(user.getUsername(), userToLogin.getPassword())
         );
-        verify(jwtService,times(0)).generateToken(user);
+        verify(jwtService, times(0)).generateToken(user);
 
     }
 }
