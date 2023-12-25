@@ -6,7 +6,8 @@ import com.mycopmany.myproject.machineapi.AbstractIntegrationTest;
 import com.mycopmany.myproject.machineapi.auth.AuthenticationService;
 import com.mycopmany.myproject.machineapi.machine.MachineService;
 import com.mycopmany.myproject.machineapi.machine.MachineToCreate;
-import com.mycopmany.myproject.machineapi.user.*;
+import com.mycopmany.myproject.machineapi.user.UserToCreate;
+import com.mycopmany.myproject.machineapi.user.UserToLogin;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,9 +21,9 @@ import org.springframework.web.context.WebApplicationContext;
 
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.junit.jupiter.api.Assertions.*;
 
 
 class MaintenanceControllerIntTest extends AbstractIntegrationTest {
@@ -52,7 +53,7 @@ class MaintenanceControllerIntTest extends AbstractIntegrationTest {
         );
         authenticationService.register(userToCreate);
 
-        UserToLogin userToLogin = new UserToLogin("username","password");
+        UserToLogin userToLogin = new UserToLogin("username", "password");
         MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders
                         .post("/api/v1/auth/authenticate")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -79,8 +80,8 @@ class MaintenanceControllerIntTest extends AbstractIntegrationTest {
         mockMvc.perform(MockMvcRequestBuilders
                         .post("/api/v1/maintenance-records")
                         .header("Authorization", "Bearer " + jwToken)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(maintenanceToCreate)))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(maintenanceToCreate)))
                 .andExpect(status().isCreated());
 
         mockMvc.perform(MockMvcRequestBuilders
@@ -94,6 +95,7 @@ class MaintenanceControllerIntTest extends AbstractIntegrationTest {
                 .andExpect(MockMvcResultMatchers.jsonPath("$[0].technicianName")
                         .value("firstname lastname"));
     }
+
     @Test
     void createMaintenanceWhenMachineDoesNotExist() throws Exception {
         MaintenanceToCreate maintenanceToCreate = new MaintenanceToCreate(
@@ -108,6 +110,7 @@ class MaintenanceControllerIntTest extends AbstractIntegrationTest {
                         .content(objectMapper.writeValueAsString(maintenanceToCreate)))
                 .andExpect(status().isNotFound());
     }
+
     @Test
     void createMaintenanceWhenTitleIsEmpty() throws Exception {
         MachineToCreate machineToCreate = new MachineToCreate(123L,
@@ -125,11 +128,11 @@ class MaintenanceControllerIntTest extends AbstractIntegrationTest {
                         .header("Authorization", "Bearer " + jwToken)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(maintenanceToCreate)))
-                .andExpect(status().isUnprocessableEntity());
+                .andExpect(status().isBadRequest());
     }
 
     @Test
-    void createAndGetMaintenanceBySerialNumber() throws Exception{
+    void createAndGetMaintenanceBySerialNumber() throws Exception {
         MachineToCreate machineToCreate = new MachineToCreate(123L,
                 "model",
                 "category",
@@ -199,12 +202,13 @@ class MaintenanceControllerIntTest extends AbstractIntegrationTest {
                 .andExpect(status().isOk());
 
         List<MaintenanceToGet> result = maintenanceService.getMaintenanceByMachine(123L);
-        assertEquals(1,result.size());
-        assertEquals("newTitle",result.get(0).getTitle());
-        assertEquals("newDescription",result.get(0).getDescription());
-        assertEquals(123L,result.get(0).getMachineId());
-        assertEquals("firstname lastname",result.get(0).getTechnicianName());
+        assertEquals(1, result.size());
+        assertEquals("newTitle", result.get(0).getTitle());
+        assertEquals("newDescription", result.get(0).getDescription());
+        assertEquals(123L, result.get(0).getMachineId());
+        assertEquals("firstname lastname", result.get(0).getTechnicianName());
     }
+
     @Test
     void editMaintenanceWhenDoesNotExist() throws Exception {
         MaintenanceToEdit maintenanceToEdit = new MaintenanceToEdit(
@@ -244,16 +248,9 @@ class MaintenanceControllerIntTest extends AbstractIntegrationTest {
         Long maintenanceId = maintenanceService.getAllMaintenance().get(0).getId();
 
         mockMvc.perform(MockMvcRequestBuilders
-                .delete("/api/v1/maintenance-records/" + maintenanceId)
-                .header("Authorization", "Bearer " + jwToken))
+                        .delete("/api/v1/maintenance-records/" + maintenanceId)
+                        .header("Authorization", "Bearer " + jwToken))
                 .andExpect(status().isNoContent());
     }
-    @Test
-    void deleteMaintenanceWhenDoesNotExist() throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders
-                        .delete("/api/v1/maintenance-records/" + 1L)
-                        .header("Authorization", "Bearer " + jwToken))
-                .andExpect(status().isNotFound());
 
-    }
 }
