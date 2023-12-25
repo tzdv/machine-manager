@@ -83,6 +83,7 @@ class AuthenticationControllerIntTest extends AbstractIntegrationTest {
                 "password");
         UserToLogin userToLogin = new UserToLogin("username", "password");
         authenticationService.register(userToCreate);
+
         MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders
                         .post("/api/v1/auth/authenticate")
                         .contentType(MediaType.APPLICATION_JSON)
