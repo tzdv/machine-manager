@@ -1,5 +1,6 @@
 package com.mycopmany.myproject.machineapi.maintenance;
 
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -11,6 +12,7 @@ import java.util.List;
 @RequestMapping(path = "api/v1/maintenance-records")
 public class MaintenanceController {
     private final MaintenanceService maintenanceService;
+
     @GetMapping
     public List<MaintenanceToGet> getMaintenance() {
         return maintenanceService.getAllMaintenance();
@@ -23,18 +25,18 @@ public class MaintenanceController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public void createMaintenance(@RequestBody MaintenanceToCreate maintenanceToCreate){
+    public void createMaintenance(@RequestBody @Valid MaintenanceToCreate maintenanceToCreate) {
         maintenanceService.createMaintenance(maintenanceToCreate);
     }
 
     @PostMapping(path = "{id}")
-    public void editMaintenance(@PathVariable("id") Long Id,@RequestBody MaintenanceToEdit maintenanceToEdit){
+    public void editMaintenance(@PathVariable("id") Long Id, @RequestBody MaintenanceToEdit maintenanceToEdit) {
         maintenanceService.editMaintenance(Id, maintenanceToEdit);
     }
 
     @DeleteMapping(path = "{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteMaintenance(@PathVariable("id") Long Id){
+    public void deleteMaintenance(@PathVariable("id") Long Id) {
         maintenanceService.deleteMaintenance(Id);
     }
 }

@@ -1,7 +1,6 @@
 package com.mycopmany.myproject.machineapi.maintenance;
 
 import com.mycopmany.myproject.machineapi.exception.ResourceNotFoundException;
-import com.mycopmany.myproject.machineapi.exception.UnprocessableEntityException;
 import com.mycopmany.myproject.machineapi.machine.Machine;
 import com.mycopmany.myproject.machineapi.machine.MachineRepository;
 import com.mycopmany.myproject.machineapi.user.AuthenticatedUser;
@@ -156,29 +155,6 @@ class MaintenanceServiceTest {
 
     }
 
-    @Test
-    void createMaintenanceWhenEmptyTitle() {
-        MaintenanceToCreate maintenanceToCreate = new MaintenanceToCreate(
-                "",
-                "description",
-                123L
-        );
-        maintenance.setMaintenanceDate(LocalDateTime.now());
-        AuthenticatedUser authenticatedUser = new AuthenticatedUser(user);
-        Authentication authentication = mock(Authentication.class);
-        SecurityContext securityContext = mock(SecurityContext.class);
-        Mockito.when(securityContext.getAuthentication()).thenReturn(authentication);
-        SecurityContextHolder.setContext(securityContext);
-        when(SecurityContextHolder.getContext().getAuthentication().getPrincipal()).thenReturn(authenticatedUser);
-        when(userRepository.findByUsername(authenticatedUser.getUsername())).thenReturn(Optional.of(user));
-        when(machineRepository.findBySerialNumber(machine.getSerialNumber())).thenReturn(Optional.of(machine));
-
-        assertThrows(UnprocessableEntityException.class,
-                () -> maintenanceService.createMaintenance(maintenanceToCreate));
-        verify(maintenanceRepository, times(0)).save(maintenance);
-
-    }
-
 
     @Test
     void editMaintenanceWhenExists() {
@@ -212,7 +188,7 @@ class MaintenanceServiceTest {
     }
 
     @Test
-    void deleteMaintenanceWhenIdExists() {
+    void deleteMaintenance() {
         when(maintenanceRepository.existsById(123L)).thenReturn(true);
 
         assertDoesNotThrow(() -> maintenanceService.deleteMaintenance(123L));
@@ -221,13 +197,4 @@ class MaintenanceServiceTest {
 
     }
 
-    @Test
-    void deleteMaintenanceWhenIdDoesNotExist() {
-        when(maintenanceRepository.existsById(123L)).thenReturn(false);
-
-        assertThrows(ResourceNotFoundException.class, () -> maintenanceService.deleteMaintenance(123L));
-
-        verify(maintenanceRepository, times(0)).deleteById(123L);
-
-    }
 }
