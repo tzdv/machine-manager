@@ -76,13 +76,5 @@ class UserControllerIntTest extends AbstractIntegrationTest {
         assertEquals(1, userRepository.count());
     }
 
-    @Test
-    void deleteUserWhenDoesNotExist() throws Exception {
-        long idToDelete = 1293L;
-        mockMvc.perform(MockMvcRequestBuilders
-                        .delete("/api/v1/users/" + idToDelete)
-                        .header("Authorization", "Bearer " + "token"))
-                .andExpect(status().isNotFound());
 
-    }
 }

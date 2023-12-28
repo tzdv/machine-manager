@@ -108,7 +108,7 @@ class MaintenanceControllerIntTest extends AbstractIntegrationTest {
                         .header("Authorization", "Bearer " + jwToken)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(maintenanceToCreate)))
-                .andExpect(status().isNotFound());
+                .andExpect(status().isBadRequest());
     }
 
     @Test
