@@ -8,10 +8,22 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+
 @ControllerAdvice
 public class ApiExceptionHandler {
+    @ExceptionHandler(value = {BadRequestException.class})
+    public ResponseEntity<Object> handleBadRequest(BadRequestException e) {
+        HttpStatus badRequest = HttpStatus.BAD_REQUEST;
+        ApiException apiException = new ApiException(
+                e.getMessage(),
+                badRequest,
+                ZonedDateTime.now(ZoneId.of("Z"))
+        );
+        return new ResponseEntity<>(apiException, badRequest);
+    }
+
     @ExceptionHandler(value = {ResourceNotFoundException.class})
-    public ResponseEntity<Object> handleResourceNotFound(ResourceNotFoundException e){
+    public ResponseEntity<Object> handleResourceNotFound(ResourceNotFoundException e) {
         HttpStatus notFound = HttpStatus.NOT_FOUND;
         ApiException apiException = new ApiException(
                 e.getMessage(),
@@ -20,6 +32,7 @@ public class ApiExceptionHandler {
         );
         return new ResponseEntity<>(apiException, notFound);
     }
+
     @ExceptionHandler(value = {UnprocessableEntityException.class})
     public ResponseEntity<Object> handleEntityNotValid(UnprocessableEntityException e) {
         HttpStatus unprocessableEntity = HttpStatus.UNPROCESSABLE_ENTITY;
@@ -32,16 +45,17 @@ public class ApiExceptionHandler {
         return new ResponseEntity<>(apiException, unprocessableEntity);
     }
 
-        @ExceptionHandler(value = {ConflictException.class})
-        public ResponseEntity<Object> handleConflictException(ConflictException e){
-            HttpStatus conflict = HttpStatus.CONFLICT;
-            ApiException apiException = new ApiException(
-                    e.getMessage(),
-                    conflict,
-                    ZonedDateTime.now(ZoneId.of("Z"))
-            );
-            return new ResponseEntity<>(apiException, conflict);
+    @ExceptionHandler(value = {ConflictException.class})
+    public ResponseEntity<Object> handleConflictException(ConflictException e) {
+        HttpStatus conflict = HttpStatus.CONFLICT;
+        ApiException apiException = new ApiException(
+                e.getMessage(),
+                conflict,
+                ZonedDateTime.now(ZoneId.of("Z"))
+        );
+        return new ResponseEntity<>(apiException, conflict);
     }
+
     @ExceptionHandler(value = {UnauthorizedException.class})
     public ResponseEntity<Object> handleUnauthorizedException(UnauthorizedException e) {
         HttpStatus unauthorized = HttpStatus.UNAUTHORIZED;

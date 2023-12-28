@@ -1,6 +1,8 @@
 package com.mycopmany.myproject.machineapi.maintenance;
 
+import com.mycopmany.myproject.machineapi.exception.BadRequestException;
 import com.mycopmany.myproject.machineapi.exception.ResourceNotFoundException;
+import com.mycopmany.myproject.machineapi.exception.UnauthorizedException;
 import com.mycopmany.myproject.machineapi.machine.Machine;
 import com.mycopmany.myproject.machineapi.machine.MachineRepository;
 import com.mycopmany.myproject.machineapi.user.AuthenticatedUser;
@@ -43,9 +45,9 @@ public class MaintenanceService {
     public void createMaintenance(MaintenanceToCreate maintenanceToCreate) {
         AuthenticatedUser authenticatedUser = (AuthenticatedUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         User user = userRepository.findByUsername(authenticatedUser.getUsername())
-                .orElseThrow(() -> new ResourceNotFoundException("Authenticated user not found"));
+                .orElseThrow(() -> new UnauthorizedException("Authenticated user not found"));
         Machine machine = machineRepository.findBySerialNumber(maintenanceToCreate.getMachineSerialNumber())
-                .orElseThrow(() -> new ResourceNotFoundException("Machine not found"));
+                .orElseThrow(() -> new BadRequestException("Machine not found"));
 
         Maintenance maintenance = new Maintenance(
                 maintenanceToCreate.getTitle(),

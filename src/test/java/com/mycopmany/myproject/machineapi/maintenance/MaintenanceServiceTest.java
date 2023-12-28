@@ -1,5 +1,6 @@
 package com.mycopmany.myproject.machineapi.maintenance;
 
+import com.mycopmany.myproject.machineapi.exception.BadRequestException;
 import com.mycopmany.myproject.machineapi.exception.ResourceNotFoundException;
 import com.mycopmany.myproject.machineapi.machine.Machine;
 import com.mycopmany.myproject.machineapi.machine.MachineRepository;
@@ -149,7 +150,7 @@ class MaintenanceServiceTest {
         when(SecurityContextHolder.getContext().getAuthentication().getPrincipal()).thenReturn(authenticatedUser);
         when(userRepository.findByUsername(authenticatedUser.getUsername())).thenReturn(Optional.of(user));
 
-        assertThrows(ResourceNotFoundException.class,
+        assertThrows(BadRequestException.class,
                 () -> maintenanceService.createMaintenance(maintenanceToCreate));
         verify(maintenanceRepository, times(0)).save(maintenance);
 
