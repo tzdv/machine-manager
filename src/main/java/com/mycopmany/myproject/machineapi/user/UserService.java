@@ -1,6 +1,5 @@
 package com.mycopmany.myproject.machineapi.user;
 
-import com.mycopmany.myproject.machineapi.exception.ResourceNotFoundException;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -20,14 +19,9 @@ public class UserService {
                 .collect(Collectors.toList());
     }
 
-    public void deleteUser(Long id){
-        boolean exists = userRepository.existsById(id);
-        if (!exists){
-            throw new ResourceNotFoundException("User with id: " + id + "does not exist");
-        }
+    public void deleteUser(Long id) {
         userRepository.deleteById(id);
     }
-
 
 
 }

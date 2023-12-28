@@ -1,6 +1,5 @@
 package com.mycopmany.myproject.machineapi.user;
 
-import com.mycopmany.myproject.machineapi.exception.ResourceNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -41,7 +40,7 @@ class UserServiceTest {
         assertNotNull(users);
         assertEquals(1, users.size());
         assertEquals("firstname", users.get(0).getFirstName());
-        assertEquals("lastname",users.get(0).getLastName());
+        assertEquals("lastname", users.get(0).getLastName());
         assertEquals("username", users.get(0).getUsername());
 
     }
@@ -56,12 +55,5 @@ class UserServiceTest {
 
     }
 
-    @Test
-    void deleteUserWhenDoesNotExist() {
-        when(userRepository.existsById(1L)).thenReturn(false);
 
-        assertThrows(ResourceNotFoundException.class,() ->userService.deleteUser(1L));
-
-        verify(userRepository, times(0)).deleteById(1L);
-    }
 }
